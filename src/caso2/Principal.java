@@ -136,29 +136,23 @@ public class Principal {
 			e1.printStackTrace();
 			return;
 		}
-	    
 	    int NF = principal.getNF();
 	    int NC = principal.getNC();
 	    int TE = principal.getTE();
 	    int TP = principal.getTP();
 	    int MP = principal.getMP();
 	    
-	    int numFallos = 0;
+
 	    int numPaginas = (int)Math.ceil((double)NF*NC*TE*3/(double)TP);
 	    TablaPaginacion tablaPaginacion = new TablaPaginacion(numPaginas);
 	    MemoriaVirtual memoriaVirtual = new MemoriaVirtual(numPaginas);
 	    MemoriaReal memoriaReal = new MemoriaReal(MP);
-	    
-	    for (Integer referencia : referencias) {
-	    	memoriaVirtual.accederPagina(referencia);
-			if(tablaPaginacion.getPagina(referencia) == -1) {
-				numFallos++;
-				int indexTabla = memoriaReal.reemplazarPagina(memoriaVirtual.getPagina(referencia));
-				tablaPaginacion.setPagina(referencia, indexTabla);
-			}
-		}
-	    
-	    System.out.println("Numero de fallos: " + numFallos);
+		
+		ArrayList<Integer> referenciasRemplazo = new ArrayList<>();
+		ThActualizacion actualizador = new ThActualizacion(referencias, referenciasRemplazo, memoriaVirtual, tablaPaginacion);
+	    ThEnvejecimiento envejecedor = new ThEnvejecimiento(referencias, referenciasRemplazo, memoriaVirtual, tablaPaginacion, memoriaReal);
+		actualizador.start();
+		envejecedor.start();
 	}
 	
 	public static void main(String[] args) {
